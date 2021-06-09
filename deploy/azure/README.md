@@ -1,6 +1,6 @@
 # How to deploy
 
-Deploy 2 VMs for Kafka and remote syslog-ng on Azure using terraform.
+Deploy 2 VMs for Kafka and remote syslog-ng on Azure using terraform. This required installation of Azure CLI on your test environment.
 
 ```
 az login
