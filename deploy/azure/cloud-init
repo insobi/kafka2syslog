@@ -14,7 +14,7 @@ write_files:
     };
 
     destination d_kafka {
-        #udp("REMOTE_SYSLOG_IP" port(REMOTE_SYSLOG_PORT))
+        #udp(ip(REMOTE_SYSLOG_IP) port(REMOTE_SYSLOG_PORT));
         file("/var/log/kafka");
     };
 
@@ -22,7 +22,7 @@ write_files:
         source(s_kafka);
         destination(d_kafka);
     };
-  path: /etc/syslog-ng/conf.d/kafka.conf
+  path: /tmp/kafka.conf
   owner: root:root
   permissions: '0644'
 
@@ -36,5 +36,6 @@ runcmd:
 - cd /root/kafka && bin/kafka-server-start.sh config/server.properties &
 - sleep 10
 - cd /root/kafka && bin/kafka-topics.sh --create --topic quickstart-events --bootstrap-server localhost:9092
+- cp /tmp/kafka.conf /etc/syslog-ng/conf.d/kafka.conf
 - systemctl restart syslog-ng
 

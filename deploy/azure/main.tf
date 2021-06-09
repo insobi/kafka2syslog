@@ -30,32 +30,36 @@ locals {
                 version   = "latest"
             }
         }
-        # receiver = { 
-        #     size            = "Standard_B1s"
-        #     admin_username  = "azureuser"
-        #     admin_password  = "cisco!123"
-        #     source_image_reference = {
-        #         publisher = "Canonical"
-        #         offer     = "UbuntuServer"
-        #         sku       = "18.04-LTS"
-        #         version   = "latest"
-        #     }
-        # }
+        receiver = { 
+            size            = "Standard_B1s"
+            admin_username  = "azureuser"
+            admin_password  = "cisco!123"
+            source_image_reference = {
+                publisher = "Canonical"
+                offer     = "UbuntuServer"
+                sku       = "18.04-LTS"
+                version   = "latest"
+            }
+        }
     }
 
     pubilc_ip = {
         kafka       = {}
-        # receiver    = {}
+        receiver    = {}
     }
 
     nsg = {
         kafka-nsg       = {}
-        # receiver-nsg    = {}
+        receiver-nsg    = {}
     }
 }
 
 data "template_file" "user_data" {
     template = file("./cloud-init")
+}
+
+data "template_file" "user_data2" {
+    template = file("./cloud-init_remote")
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -101,8 +105,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
         version   = each.value.source_image_reference.version
     }
 
-    # custom_data = contains(keys(each.value), "cloud-init") ? base64encode(each.value.cloud-init) : null
-    custom_data = base64encode(data.template_file.user_data.rendered)
+    custom_data = each.key == "kafka" ? base64encode(data.template_file.user_data.rendered) : base64encode(data.template_file.user_data2.rendered)
 }
 
 resource "azurerm_network_interface" "nic" {
@@ -150,7 +153,7 @@ resource "azurerm_network_security_rule" "nsg_rule_9092" {
     protocol                    = "*"
     source_port_range           = "*"
     destination_port_range      = "9092"
-    source_address_prefix       = "*"
+    source_address_prefix       = "10.0.0.0/24"
     destination_address_prefix  = "*"
     resource_group_name         = azurerm_resource_group.rg.name
     network_security_group_name = each.key
