@@ -29,10 +29,13 @@ Then, you can see a file written at /var/log/kafka on local VM.
 ## Testing on 2 VMs
 On first VM, edit /etc/syslog-ng/conf.d/kakfa.conf. Replace 'REMOTE_SYSLOG_IP' and 'REMOTE_SYSLOG_PORT' to proper values at kafka.conf, then remove comment '#'.
 ``` 
-# udp("REMOTE_SYSLOG_IP" port(REMOTE_SYSLOG_PORT));
+# udp(ip(REMOTE_SYSLOG_IP) port(REMOTE_SYSLOG_PORT));
 ```
 then, restart syslog-ng like below.
 ```
 systemctl restart syslog-ng
 ```
 Install syslog-ng on second VM, and copy kafka_receiver.conf to '/etc/syslog-ng/conf.d' on it. Then, restart syslog-ng. Now, when you produce messages to apache kafka, you can see messages on second VM.
+
+## Deploy environment using terraform
+please refer to 'deploy' directory.
