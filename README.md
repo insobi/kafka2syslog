@@ -24,16 +24,14 @@ bin/kafka-topics.sh --describe --topic quickstart-events --bootstrap-server loca
 # write messages
 bin/kafka-console-producer.sh --topic quickstart-events --bootstrap-server localhost:9092
 ```
-Then, can see a file written at /var/log/kafka on local VM.
+Then, you can see a file written at /var/log/kafka on local VM.
 
 ## Testing on 2 VMs
 On first VM, edit /etc/syslog-ng/conf.d/kakfa.conf. Replace 'REMOTE_SYSLOG_IP' and 'REMOTE_SYSLOG_PORT' to proper values at kafka.conf, then remove comment '#'.
 ``` 
-...
 # udp("REMOTE_SYSLOG_IP" port(REMOTE_SYSLOG_PORT));
-...
 ```
-then,
+then, restart syslog-ng like below.
 ```
 systemctl restart syslog-ng
 ```
