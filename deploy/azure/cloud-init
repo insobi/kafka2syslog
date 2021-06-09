@@ -1,0 +1,40 @@
+#cloud-config
+packages:
+    - openjdk-8-jdk
+    - syslog-ng
+    - wget
+
+package_update: true
+package_upgrade: true
+
+write_files:
+- content: |
+    source s_kafka {
+        program("/root/kafka/bin/kafka-console-consumer.sh --topic quickstart-events --bootstrap-server localhost:9092");
+    };
+
+    destination d_kafka {
+        #udp("REMOTE_SYSLOG_IP" port(REMOTE_SYSLOG_PORT))
+        file("/var/log/kafka");
+    };
+
+    log {
+        source(s_kafka);
+        destination(d_kafka);
+    };
+  path: /etc/syslog-ng/conf.d/kafka.conf
+  owner: root:root
+  permissions: '0644'
+
+runcmd:
+- wget https://mirror.navercorp.com/apache/kafka/2.8.0/kafka_2.13-2.8.0.tgz
+- tar -xzf kafka_2.13-2.8.0.tgz -C /root
+- rm -f kafka_2.13-2.8.0.tgz
+- cd /root && ln -s kafka_2.13-2.8.0 kafka
+- cd /root/kafka && bin/zookeeper-server-start.sh config/zookeeper.properties &
+- sleep 10
+- cd /root/kafka && bin/kafka-server-start.sh config/server.properties &
+- sleep 10
+- cd /root/kafka && bin/kafka-topics.sh --create --topic quickstart-events --bootstrap-server localhost:9092
+- systemctl restart syslog-ng
+
