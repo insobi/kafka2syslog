@@ -156,7 +156,7 @@ resource "azurerm_network_security_rule" "nsg_rule_9092" {
     source_address_prefix       = "10.0.0.0/24"
     destination_address_prefix  = "*"
     resource_group_name         = azurerm_resource_group.rg.name
-    network_security_group_name = each.key
+    network_security_group_name = format("%s-nsg", each.key)
 }
 
 resource "azurerm_network_security_rule" "nsg_rule_ssh" {
@@ -172,5 +172,5 @@ resource "azurerm_network_security_rule" "nsg_rule_ssh" {
     source_address_prefix       = "*"
     destination_address_prefix  = "*"
     resource_group_name         = azurerm_resource_group.rg.name
-    network_security_group_name = each.key
+    network_security_group_name = format("%s-nsg", each.key)
 }
